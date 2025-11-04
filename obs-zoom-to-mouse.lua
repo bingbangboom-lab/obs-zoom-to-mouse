@@ -827,7 +827,7 @@ function refresh_sceneitem_deferred(find_newest, delay_ms)
     delay_ms = delay_ms or 150
     deferred_find_newest = find_newest
     if deferred_refresh_pending then
-        return
+        obs.timer_remove(deferred_refresh_callback)  -- Remove old timer
     end
     deferred_refresh_pending = true
     obs.timer_add(deferred_refresh_callback, delay_ms)
@@ -1339,10 +1339,7 @@ function populate_zoom_sources(list)
         obs.obs_property_list_add_string(list, "<None>", "obs-zoom-to-mouse-none")
         for _, s in ipairs(sources) do
             local source_type = obs.obs_source_get_id(s)
-            if dc_info and (allow_all_sources or source_type == dc_info.source_id) then
-                local name = obs.obs_source_get_name(s)
-                obs.obs_property_list_add_string(list, name, name)
-            elseif not dc_info and allow_all_sources then
+            if allow_all_sources or (dc_info and source_type == dc_info.source_id) then
                 local name = obs.obs_source_get_name(s)
                 obs.obs_property_list_add_string(list, name, name)
             end
